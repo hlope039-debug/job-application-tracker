@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Contact{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('contacts') }}">Contacts</a></li>
+    <li class="breadcrumb-item active">{{ action }}</li>
+</ol></nav>
+<h1 class="h3 mb-3">{{ action }} Contact</h1>
+
+{% if not companies %}
+<div class="alert alert-warning">You need at least one company before adding a contact.
+    <a href="{{ url_for('company_new') }}">Add a company</a>.</div>
+{% endif %}
+
+<div class="card form-card"><div class="card-body">
+<form method="post">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="contact_name" class="form-label">Name <span class="text-danger">*</span></label>
+            <input id="contact_name" name="contact_name" class="form-control" required maxlength="100" value="{{ contact.contact_name or '' }}">
+        </div>
+        <div class="col-md-6">
+            <label for="company_id" class="form-label">Company <span class="text-danger">*</span></label>
+            <select id="company_id" name="company_id" class="form-select" required>
+                <option value="">Choose a company…</option>
+                {% for c in companies %}
+                <option value="{{ c.company_id }}" {% if c.company_id == contact.company_id %}selected{% endif %}>{{ c.company_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="title" class="form-label">Title</label>
+            <input id="title" name="title" class="form-control" maxlength="100" value="{{ contact.title or '' }}" placeholder="e.g. Technical Recruiter">
+        </div>
+        <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" name="email" type="email" class="form-control" maxlength="100" value="{{ contact.email or '' }}">
+        </div>
+        <div class="col-md-6">
+            <label for="phone" class="form-label">Phone</label>
+            <input id="phone" name="phone" type="tel" class="form-control" maxlength="20" value="{{ contact.phone or '' }}" placeholder="305-555-0100">
+        </div>
+        <div class="col-md-6">
+            <label for="linkedin_url" class="form-label">LinkedIn URL</label>
+            <input id="linkedin_url" name="linkedin_url" type="url" class="form-control" maxlength="200" value="{{ contact.linkedin_url or '' }}" placeholder="https://www.linkedin.com/in/…">
+        </div>
+        <div class="col-12">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="3">{{ contact.notes or '' }}</textarea>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Contact</button>
+        <a href="{{ url_for('contact_detail', contact_id=contact.contact_id) if contact.contact_id else url_for('contacts') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+</div></div>
+{% endblock %}

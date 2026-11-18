@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, page_header, empty_state %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+{{ page_header('Companies', companies|length ~ ' compan' ~ ('y' if companies|length == 1 else 'ies'),
+               url_for('company_new'), 'Add Company') }}
+
+<form class="row g-2 mb-3" method="get">
+    <div class="col-sm-8 col-md-6">
+        <input type="search" name="q" value="{{ q }}" class="form-control"
+               placeholder="Search by name, industry or city">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Search</button>
+        {% if q %}<a href="{{ url_for('companies') }}" class="btn btn-link">Clear</a>{% endif %}
+    </div>
+</form>
+
+<div class="card">
+{% if companies %}
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead class="table-light">
+        <tr><th>Company</th><th>Industry</th><th>Location</th><th class="text-center">Jobs</th>
+            <th class="text-center">Contacts</th><th class="text-end">Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for c in companies %}
+        <tr>
+            <td><a href="{{ url_for('company_detail', company_id=c.company_id) }}" class="fw-semibold">{{ c.company_name }}</a>
+                {% if c.website %}<div class="small"><a href="{{ c.website }}" target="_blank" rel="noopener" class="text-muted">{{ c.website | replace('https://', '') | replace('http://', '') }}</a></div>{% endif %}
+            </td>
+            <td>{{ c.industry or '—' }}</td>
+            <td>{{ [c.city, c.state] | select | join(', ') or '—' }}</td>
+            <td class="text-center">{{ c.job_count }}</td>
+            <td class="text-center">{{ c.contact_count }}</td>
+            <td class="text-end text-nowrap">
+                <a href="{{ url_for('company_edit', company_id=c.company_id) }}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                {{ delete_button(url_for('company_delete', company_id=c.company_id),
+                   'Delete ' ~ c.company_name ~ '? This also deletes its ' ~ c.job_count ~ ' job(s), their applications, and ' ~ c.contact_count ~ ' contact(s).') }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+{{ empty_state('No companies found.', url_for('company_new'), 'Add a company') }}
+{% endif %}
+</div>
+{% endblock %}

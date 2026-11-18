@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Application{% endblock %}
+{% macro round_row(r={}) -%}
+<div class="row g-2 align-items-end interview-row mb-2">
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Date</label>
+        <input type="date" name="iv_date" class="form-control form-control-sm" value="{{ r.date or '' }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Type</label>
+        <select name="iv_type" class="form-select form-select-sm">
+            {% for t in interview_types %}<option {% if t == r.type %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Interviewer</label>
+        <input name="iv_interviewer" class="form-control form-control-sm" value="{{ r.interviewer or '' }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Notes</label>
+        <input name="iv_notes" class="form-control form-control-sm" value="{{ r.notes or '' }}">
+    </div>
+    <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-round" title="Remove round"><i class="bi bi-x-lg"></i></button>
+    </div>
+</div>
+{%- endmacro %}
+
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('applications') }}">Applications</a></li>
+    <li class="breadcrumb-item active">{{ action }}</li>
+</ol></nav>
+<h1 class="h3 mb-3">{{ action }} Application</h1>
+
+{% if not jobs %}
+<div class="alert alert-warning">You need at least one job before logging an application.
+    <a href="{{ url_for('job_new') }}">Add a job</a>.</div>
+{% endif %}
+
+<div class="card form-card"><div class="card-body">
+<form method="post">
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label for="job_id" class="form-label">Job <span class="text-danger">*</span></label>
+            <select id="job_id" name="job_id" class="form-select" required>
+                <option value="">Choose a job…</option>
+                {% for j in jobs %}
+                <option value="{{ j.job_id }}" {% if j.job_id == a.job_id %}selected{% endif %}>{{ j.company_name }} — {{ j.job_title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="application_date" class="form-label">Application date <span class="text-danger">*</span></label>
+            <input id="application_date" name="application_date" type="date" class="form-control" required
+                   max="{{ today.isoformat() }}" value="{{ a.application_date or '' }}">
+        </div>
+        <div class="col-md-4">
+            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+            <select id="status" name="status" class="form-select" required>
+                {% for s in statuses %}<option {% if s == a.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="resume_version" class="form-label">Resume version</label>
+            <input id="resume_version" name="resume_version" class="form-control" maxlength="50"
+                   value="{{ a.resume_version or '' }}" placeholder="e.g. v3-python">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="cover_letter_sent" name="cover_letter_sent" value="1"
+                       {% if a.cover_letter_sent %}checked{% endif %}>
+                <label class="form-check-label" for="cover_letter_sent">Cover letter sent</label>
+            </div>
+        </div>
+    </div>
+
+    <fieldset class="mt-4 p-3 border rounded requirements-box">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold mb-0">Interview rounds <small class="text-muted fw-normal">(saved as JSON)</small></legend>
+        <div id="rounds">
+            {% for r in a.rounds %}{{ round_row(r) }}{% endfor %}
+        </div>
+        <template id="round-template">{{ round_row() }}</template>
+        <button type="button" id="add-round" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg"></i> Add interview round</button>
+    </fieldset>
+
+    <div class="mt-4">
+        <button class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Application</button>
+        <a href="{{ url_for('application_detail', application_id=a.application_id) if a.application_id else url_for('applications') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+</div></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const rounds = document.getElementById('rounds');
+    document.getElementById('add-round').addEventListener('click', function () {
+        rounds.appendChild(document.getElementById('round-template').content.cloneNode(true));
+    });
+    rounds.addEventListener('click', function (event) {
+        const btn = event.target.closest('.remove-round');
+        if (btn) btn.closest('.interview-row').remove();
+    });
+</script>
+{% endblock %}

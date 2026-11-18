@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "_macros.html" import skill_badges, empty_state %}
+{% block title %}Job Match{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <h1 class="h3 mb-0">Job Match</h1>
+    <p class="text-muted mb-0">Enter your skills to see which tracked jobs fit you best.</p>
+</div>
+
+<div class="card mb-4"><div class="card-body">
+<form method="post" class="row g-3 align-items-end">
+    <div class="col-lg-6">
+        <label for="skills" class="form-label fw-semibold">Your skills</label>
+        <input id="skills" name="skills" class="form-control form-control-lg" value="{{ skills_text }}"
+               placeholder="Python, SQL, Flask" autofocus>
+        <div class="form-text">Comma-separated. Matching ignores case and common aliases (JS = JavaScript).</div>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+        <label for="job_type" class="form-label">Job type</label>
+        <select id="job_type" name="job_type" class="form-select">
+            <option value="">Any</option>
+            {% for t in job_types %}<option {% if t == sel_type %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-6 col-lg-2">
+        <label for="min_percent" class="form-label">Minimum match</label>
+        <select id="min_percent" name="min_percent" class="form-select">
+            {% for p in [0, 25, 50, 75, 100] %}<option value="{{ p }}" {% if p == min_percent %}selected{% endif %}>{{ p }}%+</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-lg-2 d-grid">
+        <button class="btn btn-primary btn-lg"><i class="bi bi-stars"></i> Match</button>
+    </div>
+</form>
+</div></div>
+
+{% if results is not none %}
+<h2 class="h5 mb-1">Your Skills: <span class="fw-normal">{{ user_skills | join(', ') }}</span></h2>
+<p class="text-muted">{{ results|length }} job{{ '' if results|length == 1 else 's' }} ranked by match percentage</p>
+
+{% if results %}
+<ol class="list-unstyled match-list">
+{% for r in results %}
+    {% set color = 'success' if r.percent >= 75 else ('warning' if r.percent >= 50 else 'danger') %}
+    <li class="card mb-3 match-card">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between gap-2">
+                <div>
+                    <span class="match-rank">{{ loop.index }}.</span>
+                    <a href="{{ url_for('job_detail', job_id=r.job_id) }}" class="h5 mb-0">{{ r.job_title }}</a>
+                    <span class="text-muted">at {{ r.company_name }}</span>
+                    {% if r.applied %}<span class="badge text-bg-secondary ms-1">Applied</span>{% endif %}
+                    <div class="small text-muted mt-1">{{ r.job_type }} · {{ r.salary_min | money }} – {{ r.salary_max | money }}</div>
+                </div>
+                <div class="text-end">
+                    <div class="match-percent text-{{ color }}">{{ r.percent }}%</div>
+                    <div class="small text-muted">{{ r.matched_count }}/{{ r.total }} skills</div>
+                </div>
+            </div>
+            <div class="progress my-2" style="height: 8px" role="progressbar" aria-label="Match"
+                 aria-valuenow="{{ r.percent }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-{{ color }}" style="width: {{ r.percent }}%"></div>
+            </div>
+            <div class="small">
+                {% if r.matched %}<span class="me-1">Matched:</span>{{ skill_badges(r.matched, 'success') }}{% endif %}
+                {% if r.missing %}<div class="mt-1"><span class="me-1">Missing:</span>{{ skill_badges(r.missing, 'danger') }}</div>{% endif %}
+            </div>
+            {% if not r.applied %}
+            <a href="{{ url_for('application_new', job=r.job_id) }}" class="btn btn-sm btn-outline-primary mt-2"><i class="bi bi-send"></i> Log application</a>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
+</ol>
+{% else %}
+{{ empty_state('No jobs meet that minimum match. Try lowering the minimum or adding more skills.') }}
+{% endif %}
+{% endif %}
+{% endblock %}

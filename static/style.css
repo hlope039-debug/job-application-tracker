@@ -1,0 +1,63 @@
+/* Job Application Tracker — custom styles layered on Bootstrap 5 */
+
+:root {
+    --brand: #1f4e79;
+    --brand-dark: #163a5c;
+    --page-bg: #f4f6f9;
+}
+
+body {
+    background: var(--page-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main { flex: 1; }
+
+.app-navbar { background: var(--brand); }
+.app-navbar .nav-link { border-radius: .375rem; }
+.app-navbar .nav-link.active { background: var(--brand-dark); }
+
+.btn-primary { background: var(--brand); border-color: var(--brand); }
+.btn-primary:hover, .btn-primary:focus { background: var(--brand-dark); border-color: var(--brand-dark); }
+a { color: var(--brand); }
+
+.card { border: 0; box-shadow: 0 1px 3px rgba(16, 24, 40, .08); }
+.card-header { border-bottom: 1px solid #eef0f3; }
+.form-card { max-width: 900px; }
+
+/* Dashboard */
+.stat-card { color: inherit; transition: transform .15s, box-shadow .15s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 24, 40, .12); }
+.stat-icon { font-size: 1.4rem; color: var(--brand); }
+.stat-value { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+.stat-label { color: #6c757d; font-size: .9rem; }
+
+.status-row { display: flex; align-items: center; gap: .75rem; margin-bottom: .6rem; color: inherit; }
+.status-row:hover .status-name { text-decoration: underline; }
+.status-name { width: 90px; font-size: .9rem; }
+.status-count { width: 28px; text-align: right; font-weight: 600; }
+.status-row .progress { height: 12px; }
+
+/* Tables and badges */
+.table > :not(caption) > * > * { padding: .7rem .75rem; }
+.skill-badge { font-weight: 500; margin: 0 .2rem .2rem 0; }
+.skills-cell { max-width: 260px; }
+.status-filter .btn { margin: 0 .25rem .25rem 0; }
+
+.requirements-box { background: #fafbfc; }
+.json-block {
+    background: #1e2330;
+    color: #d4e2ff;
+    padding: .75rem;
+    border-radius: .375rem;
+    font-size: .8rem;
+}
+
+/* Job Match */
+.match-rank { font-weight: 700; color: #6c757d; margin-right: .25rem; }
+.match-percent { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.match-card { border-left: 4px solid var(--brand); }
+
+.empty-state { color: #8a94a6; }

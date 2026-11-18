@@ -1,0 +1,33 @@
+{# Reusable bits shared by several templates #}
+
+{% macro delete_button(url, message, small=true) -%}
+<form method="post" action="{{ url }}" class="d-inline confirm-delete" data-message="{{ message }}">
+    <button type="submit" class="btn btn-outline-danger {% if small %}btn-sm{% endif %}" title="Delete">
+        <i class="bi bi-trash"></i>{% if not small %} Delete{% endif %}
+    </button>
+</form>
+{%- endmacro %}
+
+{% macro page_header(title, subtitle=None, add_url=None, add_label=None) -%}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h1 class="h3 mb-0">{{ title }}</h1>
+        {% if subtitle %}<p class="text-muted mb-0">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if add_url %}
+    <a href="{{ add_url }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> {{ add_label }}</a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro skill_badges(skills, style='secondary') -%}
+{% for s in skills %}<span class="badge text-bg-{{ style }} skill-badge">{{ s }}</span>{% endfor %}
+{%- endmacro %}
+
+{% macro empty_state(text, url=None, label=None) -%}
+<div class="text-center text-muted py-5 empty-state">
+    <i class="bi bi-inbox display-6 d-block mb-2"></i>
+    <p class="mb-2">{{ text }}</p>
+    {% if url %}<a href="{{ url }}" class="btn btn-sm btn-primary">{{ label }}</a>{% endif %}
+</div>
+{%- endmacro %}
