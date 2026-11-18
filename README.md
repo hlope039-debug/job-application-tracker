@@ -60,13 +60,14 @@ job_tracker/
 ## Setup Instructions
 
 ### 1. Prerequisites
-- Python 3.10 or newer
+- Python 3.9 or newer
 - MySQL Server 8.0 or newer (MySQL Workbench is optional)
 - Git
 
 ### 2. Clone the repository
 ```bash
-git clone https://github.com/<your-username>/job_tracker.git
+git clone https://github.com/hlope039-debug/job-application-tracker.git
+cd job-application-tracker
 cd job_tracker
 ```
 
